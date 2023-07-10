@@ -11,3 +11,6 @@ class Camera:
         self.cam.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
         self.cam.set(cv2.CAP_PROP_FRAME_WIDTH,400)
         self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT,300)
+
+    def decode_frame(self):
+        pass

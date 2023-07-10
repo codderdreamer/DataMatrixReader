@@ -1,5 +1,5 @@
 import cv2
-# from pylibdmtx import pylibdmtx
+from pylibdmtx import pylibdmtx
 import threading
 import numpy as np
 from ModbusModule import *
@@ -7,7 +7,7 @@ from ModbusModule import *
 #import zxingcpp
 #import numpy
 
-from dbr import BarcodeReader, EnumErrorCode
+# from dbr import BarcodeReader, EnumErrorCode
 
 readed = True
 
@@ -22,15 +22,23 @@ def decode_frame(frame):
     readed = True
 
 
-vid = cv2.VideoCapture('/dev/v4l/by-id/usb-Arducam_Technology_Co.__Ltd._Arducam_16MP_SN0001-video-index0')
+# vid = cv2.VideoCapture('/dev/v4l/by-id/usb-Arducam_Technology_Co.__Ltd._Arducam_16MP_SN0001-video-index0')
+# vid.set(cv2.CAP_PROP_EXPOSURE, 500)
+# vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+# vid.set(cv2.CAP_PROP_FRAME_WIDTH,1600)
+# vid.set(cv2.CAP_PROP_FRAME_HEIGHT,1200)
+
+vid = cv2.VideoCapture('/dev/v4l/by-id/usb-Arducam_Technology_Co.__Ltd._Arducam_OV2311_USB_Camera_UC621-video-index0')
 vid.set(cv2.CAP_PROP_EXPOSURE, 500)
-vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','U','Y','V'))
 vid.set(cv2.CAP_PROP_FRAME_WIDTH,1600)
 vid.set(cv2.CAP_PROP_FRAME_HEIGHT,1200)
 
+
+
 modbus.connect_modbus()
 time.sleep(5)
-modbus.open_white_led()
+modbus.open_blue_led()
 
 while(True):
     try:
@@ -49,11 +57,11 @@ while(True):
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            ret,thresh = cv2.threshold(frame, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-            # print("decode baş.")
-
-            # if readed == True:
-            #     threading.Thread(target=decode_frame,args=(thresh,),daemon=True).start()
+            # ret,thresh = cv2.threshold(frame, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+            _,thresh = cv2.threshold(frame, int(np.max(frame)*0.8), 255, cv2.THRESH_BINARY)
+   
+            if readed == True:
+                threading.Thread(target=decode_frame,args=(thresh,),daemon=True).start()
             
             #1
             #np_arr = numpy.array(frame)
@@ -61,20 +69,20 @@ while(True):
             #print(results)
 
             #2 Çok hızlı ama ücretli
-            reader = BarcodeReader()
-            results = reader.decode_buffer(frame)
-            if results != None:
-               for text_result in results:
-                   print("Barcode Format : ")
-                   print(text_result.barcode_format_string)
-                   print("Barcode Text : ")
-                   print(text_result.barcode_text)
-                   print("Localization Points : ")
-                   print(text_result.localization_result.localization_points)
-                   print("Exception : ")
-                   print(text_result.exception)
-                   print("-------------")
-                   print(results)
+            # reader = BarcodeReader()
+            # results = reader.decode_buffer(frame)
+            # if results != None:
+            #    for text_result in results:
+            #        print("Barcode Format : ")
+            #        print(text_result.barcode_format_string)
+            #        print("Barcode Text : ")
+            #        print(text_result.barcode_text)
+            #        print("Localization Points : ")
+            #        print(text_result.localization_result.localization_points)
+            #        print("Exception : ")
+            #        print(text_result.exception)
+            #        print("-------------")
+            #        print(results)
             
         else:
             print("frame yok")
